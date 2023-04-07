@@ -10,10 +10,12 @@ function App() {
   const [currentWeather, setCurrentWeather] = useState(null);
   const [temperatureUnit, setTemperatureUnit] = useState("c");
   const [history, setHistory] = useState(null);
+  const [future, setFuture] = useState(null);
 
   async function getWeatherHistory(location) {
     const now = new Date();
     const historyRecords = [];
+    const futureRecords = [];
 
     // Get 5 days before today
     for (let day = 1; day <= 5; day++) {
@@ -23,7 +25,7 @@ function App() {
 
       const response = await fetch(apiUrl);
       const data = await response.json();
-      const forecast = data.forecast;
+      const forecast = data.forecast.forecastday[0];
       historyRecords.push(forecast);
     }
     
@@ -35,11 +37,13 @@ function App() {
       
       const response = await fetch(apiUrl);
       const data = await response.json();
-      const forecast = data.forecast;
-      historyRecords.push(forecast);
+      const forecast = data.forecast.forecastday[0];
+      futureRecords.push(forecast);
     }
 
+    console.log(historyRecords);
     setHistory(historyRecords);
+    setFuture(futureRecords);
     
     return data;
   }
@@ -81,12 +85,28 @@ function App() {
         <option value="f">Fahrenheit</option>
       </select>
 
-      {location && currentWeather && (
-        <CurrentWeather
-          temperatureUnit={temperatureUnit}
-          location={location}
-          currentWeather={currentWeather}
-        />
+      {location && currentWeather && history && future && (
+        <>
+          {/* {history.map((day) => (
+            <CurrentWeather 
+              temperatureUnit={temperatureUnit}
+              location={location}
+              currentWeather={currentWeather}
+            />
+          ))} */}
+          <CurrentWeather
+            temperatureUnit={temperatureUnit}
+            location={location}
+            currentWeather={currentWeather}
+          />
+          {/* {future.map((day) => (
+            <CurrentWeather 
+              temperatureUnit={temperatureUnit}
+              location={location}
+              currentWeather={currentWeather}
+            />
+          ))} */}
+        </>
       )}
     </div>
   );

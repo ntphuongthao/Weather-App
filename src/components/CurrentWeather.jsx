@@ -1,9 +1,6 @@
 import './CurrentWeather.css';
 
-const CurrentWeather = ({ temperatureUnit, currentWeather }) => {
-  console.log('temperature unit:', temperatureUnit);
-  console.log('location:', location);
-
+const CurrentWeather = ({ temperatureUnit, currentWeather, future }) => {
   const {
     day,
     hour,
@@ -11,6 +8,7 @@ const CurrentWeather = ({ temperatureUnit, currentWeather }) => {
     astro,
   } = currentWeather;
 
+  // console.log(date);
   const {
     avghumidity: humidity,
     avgtemp_c: celsius,
@@ -34,8 +32,15 @@ const CurrentWeather = ({ temperatureUnit, currentWeather }) => {
   const maxTemp = temperatureUnit === "c" ? maxCelsius : maxFahrenheit;
   const minTemp = temperatureUnit === "c" ? minCelsius: minFahrenheit;
 
+  function datetimeToWeekday(datetimeString) {
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const date = new Date(datetimeString);
+    return weekdays[date.getDay()];
+  }
+
   return (
     <div className="scroll-item">
+      <h3>{datetimeToWeekday(date)} {future ? "(Next week)" : ""}</h3>
       <div id="card" className="weather flex">
         <div className="details">
           <div className="temp">

@@ -19,7 +19,7 @@ const App = () => {
     const futureRecords = [];
 
     // Get 5 days before today
-    for (let day = 1; day <= 2; day++) {
+    for (let day = 1; day <= 3; day++) {
       const dayTime = new Date(now - 24 * 60 * 60 * 1000 * day);
       const dayTimeFormatted = dayTime.toISOString().slice(0, 10);
       const apiUrl = `http://api.weatherapi.com/v1/history.json?key=${VITE_WEATHER_API_KEY}&q=${selection}&dt=${dayTimeFormatted}`;
@@ -30,18 +30,17 @@ const App = () => {
       historyRecords.push(forecast);
     }
     
-    // Get 5 days forecast after today
-    for (let day = 1; day <= 2; day++) {
-      const dayTime = new Date(now + 24 * 60 * 60 * 1000 * day);
-      const dayTimeFormatted = dayTime.toISOString().slice(0, 10);
-      const apiUrl = `http://api.weatherapi.com/v1/history.json?key=${VITE_WEATHER_API_KEY}&q=${selection}&dt=${dayTimeFormatted}`;
-      
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-      const forecast = data.forecast.forecastday[0];
-      futureRecords.push(forecast);
-    }
-    console.log(historyRecords);
+    // Get 1 week forecast after today
+    const dayTime = new Date();
+    dayTime.setTime(now.getTime() + (24 * 60 * 60 * 1000));
+    const dayTimeFormatted = dayTime.toISOString().slice(0, 10);
+    const apiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${VITE_WEATHER_API_KEY}&q=${selection}&dt=${dayTimeFormatted}`;
+    
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    const forecast = data.forecast.forecastday[0];
+    futureRecords.push(forecast);
+
     setHistory(historyRecords);
     setFuture(futureRecords);
   }
@@ -97,18 +96,24 @@ const App = () => {
           <>
             {history.map((day) => (
               <CurrentWeather 
+                future={false}
+                key={day.date}
                 temperatureUnit={temperatureUnit}
                 currentWeather={day}
               />
             ))}
             <CurrentWeather
+              future={false}
+              key={new Date()}
               temperatureUnit={temperatureUnit}
               currentWeather={currentWeather}
             />
             {future.map((day) => (
-              <CurrentWeather 
+              <CurrentWeather
+                future={true}
+                key={day.date}
                 temperatureUnit={temperatureUnit}
-                currentWeather={currentWeather}
+                currentWeather={day}
               />
             ))}
           </>

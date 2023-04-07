@@ -8,7 +8,6 @@ const CurrentWeather = ({ temperatureUnit, currentWeather, future }) => {
     astro,
   } = currentWeather;
 
-  // console.log(date);
   const {
     avghumidity: humidity,
     avgtemp_c: celsius,
@@ -26,7 +25,6 @@ const CurrentWeather = ({ temperatureUnit, currentWeather, future }) => {
     icon,
     text,
   } = condition;
-  console.log(day);
 
   const averageTemp = temperatureUnit === "c" ? celsius : fahrenheit;
   const maxTemp = temperatureUnit === "c" ? maxCelsius : maxFahrenheit;

@@ -1,9 +1,10 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 const VITE_WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 import LocationSearch from './components/LocationSearch';
 import CurrentWeather from './components/CurrentWeather';
 import CenteredScrollBar from './components/CenteredScrollBar';
+import WeatherChart from './components/WeatherChart';
 
 const App = () => {
   const [selection, setSelection] = useState("");
@@ -13,7 +14,7 @@ const App = () => {
   const [history, setHistory] = useState(null);
   const [future, setFuture] = useState(null);
 
-  async function getWeatherHistory(location) {
+  async function getWeatherHistory() {
     const now = new Date();
     const historyRecords = [];
     const futureRecords = [];
@@ -32,7 +33,7 @@ const App = () => {
     
     // Get 1 week forecast after today
     const dayTime = new Date();
-    dayTime.setTime(now.getTime() + (24 * 60 * 60 * 1000));
+    dayTime.setTime(now.getTime() + (7 * 24 * 60 * 60 * 1000));
     const dayTimeFormatted = dayTime.toISOString().slice(0, 10);
     const apiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${VITE_WEATHER_API_KEY}&q=${selection}&dt=${dayTimeFormatted}`;
     
@@ -45,11 +46,6 @@ const App = () => {
     setFuture(futureRecords);
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (selection !== "") fetchData();
-  }
-
   const fetchData = async () => {
     const currentTime = new Date();
     const currentTimeFormatted = currentTime.toISOString().slice(0, 10);
@@ -57,13 +53,19 @@ const App = () => {
     const response = await fetch(apiUrl);
     const json = await response.json();
 
+    // console.log(json.forecast.forecastday[0]);
     setLocation(json.location);
     setCurrentWeather(json.forecast.forecastday[0]);
-    getWeatherHistory(location);
+    getWeatherHistory();
   }
 
   const handleTemperatureChange = (e) => {
     setTemperatureUnit(e.target.value);
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    fetchData();
   }
 
   return (
@@ -90,6 +92,8 @@ const App = () => {
           <h3>{location.country}</h3>
         </>
       )}
+
+      {location && <WeatherChart selection={selection} />}
       
       <div className="flex scroll-container">
         {location && currentWeather && history && future && (

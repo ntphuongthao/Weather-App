@@ -9,6 +9,40 @@ function App() {
   const [location, setLocation] = useState(null);
   const [currentWeather, setCurrentWeather] = useState(null);
   const [temperatureUnit, setTemperatureUnit] = useState("c");
+  const [history, setHistory] = useState(null);
+
+  async function getWeatherHistory(location) {
+    const now = new Date();
+    const historyRecords = [];
+
+    // Get 5 days before today
+    for (let day = 1; day <= 5; day++) {
+      const dayTime = new Date(now - 24 * 60 * 60 * 1000 * day);
+      const dayTimeFormatted = dayTime.toISOString().slice(0, 10);
+      const apiUrl = `http://api.weatherapi.com/v1/history.json?key=${VITE_WEATHER_API_KEY}&q=${selection}&dt=${dayTimeFormatted}`;
+
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      const forecast = data.forecast;
+      historyRecords.push(forecast);
+    }
+    
+    // Get 5 days forecast after today
+    for (let day = 1; day <= 5; day++) {
+      const dayTime = new Date(now + 24 * 60 * 60 * 1000 * day);
+      const dayTimeFormatted = dayTime.toISOString().slice(0, 10);
+      const apiUrl = `http://api.weatherapi.com/v1/history.json?key=${VITE_WEATHER_API_KEY}&q=${selection}&dt=${dayTimeFormatted}`;
+      
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      const forecast = data.forecast;
+      historyRecords.push(forecast);
+    }
+
+    setHistory(historyRecords);
+    
+    return data;
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -22,6 +56,7 @@ function App() {
 
     setLocation(json.location);
     setCurrentWeather(json.current);
+    getWeatherHistory(location);
   }
 
   const handleTemperatureChange = (e) => {

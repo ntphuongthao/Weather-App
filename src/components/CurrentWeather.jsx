@@ -30,6 +30,18 @@ const CurrentWeather = ({ temperatureUnit, location, currentWeather }) => {
             <th>Feels like</th>
             <td>{currentFeelsLike}</td>
           </tr>
+          <tr>
+            <th>Cloud</th>
+            <td>{cloud}</td>
+          </tr>
+          <tr>
+            <th>Humidity</th>
+            <td>{humidity}</td>
+          </tr>
+          <tr>
+            <th>Ultraviolet</th>
+            <td>{uv}</td>
+          </tr>
         </table>
       </div>
       <h3>Weather Description: {weatherDescription}</h3>

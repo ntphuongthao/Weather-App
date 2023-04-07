@@ -1,52 +1,63 @@
 import './CurrentWeather.css';
 
-const CurrentWeather = ({ temperatureUnit, location, currentWeather }) => {
+const CurrentWeather = ({ temperatureUnit, currentWeather }) => {
+  console.log('temperature unit:', temperatureUnit);
+  console.log('location:', location);
+
   const {
-    condition,
-    last_updated: lastUpdated,
-    cloud,
-    humidity,
-    temp_c: celcius,
-    temp_f: fahrenheit,
-    uv,
-    feelslike_c: feelsLikeCelsius,
-    feelslike_f: feelsLikeFahrenheit,
+    day,
+    hour,
+    date,
+    astro,
   } = currentWeather;
 
-  const { text: weatherDescription, icon } = condition;
-  const currentTemp = temperatureUnit === "c" ? celcius + " C": fahrenheit + " F";
-  const currentFeelsLike = temperatureUnit === "c" ? feelsLikeCelsius + " C": feelsLikeFahrenheit + " F";
+  const {
+    avghumidity: humidity,
+    avgtemp_c: celsius,
+    avgtemp_f: fahrenheit,
+    condition,
+    maxtemp_c: maxCelsius,
+    maxtemp_f: maxFahrenheit,
+    mintemp_c: minCelsius,
+    mintemp_f: minFahrenheit,
+    uv,
+    maxwind_kph: maxWindKPH,
+  } = day;
+
+  const {
+    icon,
+    text,
+  } = condition;
+  console.log(day);
+
+  const averageTemp = temperatureUnit === "c" ? celsius : fahrenheit;
+  const maxTemp = temperatureUnit === "c" ? maxCelsius : maxFahrenheit;
+  const minTemp = temperatureUnit === "c" ? minCelsius: minFahrenheit;
 
   return (
-    <div>
-      <p>Last Updated: {lastUpdated}</p>
-      <div className="flex">
-        <table>
-          <tr>
-            <th>Current Temperature</th>
-            <td>{currentTemp}</td>
-          </tr>
-          <tr>
-            <th>Feels like</th>
-            <td>{currentFeelsLike}</td>
-          </tr>
-          <tr>
-            <th>Cloud</th>
-            <td>{cloud}</td>
-          </tr>
-          <tr>
-            <th>Humidity</th>
-            <td>{humidity}</td>
-          </tr>
-          <tr>
-            <th>Ultraviolet</th>
-            <td>{uv}</td>
-          </tr>
-        </table>
-      </div>
-      <h3>Weather Description: {weatherDescription}</h3>
-      <img src={icon} alt="Icon for the current weather" />
+    <div className="scroll-item">
+      <div id="card" className="weather flex">
+        <div className="details">
+          <div className="temp">
+            {Math.round(averageTemp)}
+            <span>&deg;</span>
+          </div>
+          <div className="right">
+            <div id="summary">{text}</div>
+          </div>
+        </div>
 
+        <img alt="weather image" src={icon} />
+        <div className="infos">
+          <div className="humidity">Humidity {humidity}%</div>
+          <img
+            alt="windspeed1"
+            src="wind.svg"
+            height="40px"
+          />
+          <div className="windspeed">Wind Speed {maxWindKPH} km</div>
+        </div>
+      </div>
     </div>
   );
 }

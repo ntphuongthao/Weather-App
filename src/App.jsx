@@ -3,8 +3,9 @@ import { useState } from 'react';
 const VITE_WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 import LocationSearch from './components/LocationSearch';
 import CurrentWeather from './components/CurrentWeather';
+import CenteredScrollBar from './components/CenteredScrollBar';
 
-function App() {
+const App = () => {
   const [selection, setSelection] = useState("");
   const [location, setLocation] = useState(null);
   const [currentWeather, setCurrentWeather] = useState(null);
@@ -18,7 +19,7 @@ function App() {
     const futureRecords = [];
 
     // Get 5 days before today
-    for (let day = 1; day <= 5; day++) {
+    for (let day = 1; day <= 2; day++) {
       const dayTime = new Date(now - 24 * 60 * 60 * 1000 * day);
       const dayTimeFormatted = dayTime.toISOString().slice(0, 10);
       const apiUrl = `http://api.weatherapi.com/v1/history.json?key=${VITE_WEATHER_API_KEY}&q=${selection}&dt=${dayTimeFormatted}`;
@@ -30,7 +31,7 @@ function App() {
     }
     
     // Get 5 days forecast after today
-    for (let day = 1; day <= 5; day++) {
+    for (let day = 1; day <= 2; day++) {
       const dayTime = new Date(now + 24 * 60 * 60 * 1000 * day);
       const dayTimeFormatted = dayTime.toISOString().slice(0, 10);
       const apiUrl = `http://api.weatherapi.com/v1/history.json?key=${VITE_WEATHER_API_KEY}&q=${selection}&dt=${dayTimeFormatted}`;
@@ -40,12 +41,9 @@ function App() {
       const forecast = data.forecast.forecastday[0];
       futureRecords.push(forecast);
     }
-
     console.log(historyRecords);
     setHistory(historyRecords);
     setFuture(futureRecords);
-    
-    return data;
   }
 
   const handleSubmit = (e) => {
@@ -54,12 +52,14 @@ function App() {
   }
 
   const fetchData = async () => {
-    const API_URL=`https://api.weatherapi.com/v1/current.json?key=${VITE_WEATHER_API_KEY}&q=${selection}`
-    const response = await fetch(API_URL);
+    const currentTime = new Date();
+    const currentTimeFormatted = currentTime.toISOString().slice(0, 10);
+    const apiUrl = `http://api.weatherapi.com/v1/history.json?key=${VITE_WEATHER_API_KEY}&q=${selection}&dt=${currentTimeFormatted}`;
+    const response = await fetch(apiUrl);
     const json = await response.json();
 
     setLocation(json.location);
-    setCurrentWeather(json.current);
+    setCurrentWeather(json.forecast.forecastday[0]);
     getWeatherHistory(location);
   }
 
@@ -84,32 +84,40 @@ function App() {
         <option value="c">Celsius</option>
         <option value="f">Fahrenheit</option>
       </select>
-
-      {location && currentWeather && history && future && (
+      {location && (
         <>
-          {/* {history.map((day) => (
-            <CurrentWeather 
-              temperatureUnit={temperatureUnit}
-              location={location}
-              currentWeather={currentWeather}
-            />
-          ))} */}
-          <CurrentWeather
-            temperatureUnit={temperatureUnit}
-            location={location}
-            currentWeather={currentWeather}
-          />
-          {/* {future.map((day) => (
-            <CurrentWeather 
-              temperatureUnit={temperatureUnit}
-              location={location}
-              currentWeather={currentWeather}
-            />
-          ))} */}
+          <h2>{location.date}</h2>
+          <h3>{location.name}, {location.region}</h3>
+          <h3>{location.country}</h3>
         </>
       )}
+      
+      <div className="flex scroll-container">
+        {location && currentWeather && history && future && (
+          <>
+            {history.map((day) => (
+              <CurrentWeather 
+                temperatureUnit={temperatureUnit}
+                currentWeather={day}
+              />
+            ))}
+            <CurrentWeather
+              temperatureUnit={temperatureUnit}
+              currentWeather={currentWeather}
+            />
+            {future.map((day) => (
+              <CurrentWeather 
+                temperatureUnit={temperatureUnit}
+                currentWeather={currentWeather}
+              />
+            ))}
+          </>
+        )}
+      </div>
+      {/* <CenteredScrollBar /> */}
     </div>
   );
 }
+
 
 export default App;
